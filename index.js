@@ -13,26 +13,26 @@ app.set('view engine', 'jade')
 app.set('view options', { layout: true})
 app.set('views', __dirname+ '/views')
 
-app.get('/stooges/:name?',(req, res, next) => {
-    
-    var name = req.params.name;
-
-    switch (name? name.toLowerCase(): '') {
-        case 'larry':
-        case 'curly':
-        case 'moe':
-        res.render('stooges', {stooge: name});
-                   
-            break;
-    
-        default:
-            next;
-    }
-});
-
-app.get('/stooges/?', (req, res) => {
-    res.send('no stooges listed')
+app.get('/stooges/chat',(req, res, next) => {
+    res.render('chat')
 })
+
+io.sockets.on('connection', (req, res, next) =>{
+    var sendChat = function (title, text) {
+        socket.emit('chat', {
+            title: title,
+            contents: text
+        })
+        
+    }
+})
+
+
+setInterval(function(){
+    var randomIndex = Math.floor(Math.random()*catchPhrases.length)
+    sendChat('Stooge', catchPhrases[randomIndex])
+},5000)
+
 
 app.get('/?', (req,res) => {
     res.send('hello world')
